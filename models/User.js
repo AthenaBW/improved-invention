@@ -1,37 +1,54 @@
-// Importing dependencies from mongoose library
-const { Schema, model, } = require('mongoose'); 
+// Import required dependencies from mongoose 
+const { Schema, model, Types } = require('mongoose'); 
 
-// User Schema and email validation
-const userSchema = new Schema({
-    username: {
-        type: String,
-        required: true,
-        trim: true,
-        unique: true
-    },   email: {
+// Defining the User schema with the required fields and their respective data types
+const userSchema = new Schema(
+  { username: {
         type: String,
         required: true,
         unique: true,
-        match: [/.+@.+\..+/]
+        trim: true,
     },
-    thoughts: [{ type: Schema.Types.ObjectId, ref: 'Thought' }],
-    friends: [{ type: Schema.Types.ObjectId, ref: 'User' }]
-},
-{
-    toJSON: {
-        virtuals: true
+    
+    // regular expression to validate email format
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        validate: { 
+          validator: function(v) {
+            return /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/.test(v);
+         }
+      }
     },
-    id: false
-});
 
-// Virtual friend count defined and returned in friends array
-userSchema.virtual('friendCount').get(function() {
+    friends:[
+      {
+        type: Schema.Types.ObjectId, ref: 'User',
+    }
+  ],
+    thoughts:[
+      {
+        type: Schema.Types.ObjectId, ref: 'Thought',
+    }
+  ],
+  },
+  {
+    toJSON: {
+      virtuals: true, 
+    },
+    id: false, 
+}
+);
+
+// Defining a virtual property which returns the number of friends in riends array
+userSchema.virtual('friendCount').get(function(){
     return this.friends.length;
 });
 
-// User model created
-const User = model('User', userSchema);
+// Creating User model from the userSchema
 
-// User model export
+const User = model('User',userSchema)
 
-module.exports = User;
+// Exporting the User model as a module
+module.exports = User
