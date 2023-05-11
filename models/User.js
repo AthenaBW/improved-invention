@@ -1,5 +1,5 @@
 // Importing dependencies from mongoose library
-const { Schema, model, Types } = require('mongoose'); 
+const { Schema, model, } = require('mongoose'); 
 
 // User Schema and email validation
 const userSchema = new Schema({
@@ -8,11 +8,11 @@ const userSchema = new Schema({
         required: true,
         trim: true,
         unique: true
-    },    email: {
+    },   email: {
         type: String,
         required: true,
         unique: true,
-       
+        match: [/.+@.+\..+/]
     },
     thoughts: [{ type: Schema.Types.ObjectId, ref: 'Thought' }],
     friends: [{ type: Schema.Types.ObjectId, ref: 'User' }]
